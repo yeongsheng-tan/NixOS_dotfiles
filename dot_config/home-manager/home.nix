@@ -57,6 +57,8 @@
     fd
     fzf
     zoxide
+    mise
+    xclip
   ];
 
   # Home Manager is pretty good at managing dotfiles. The primary way to manage
@@ -124,7 +126,13 @@
 
     initExtra = ''
       export GPG_TTY=$(tty)
+      export ZSH_DISABLE_COMPFIX=true
       export ZIM_HOME=''${XDG_CACHE_HOME:-$HOME/.cache}/zim
+
+      # Force disable Zimfw's completion module before loading Zim
+      zstyle ':zim:completion' dumpfile "''${ZIM_HOME}/.zcompdump-disabled"
+      zstyle ':zim' disable-version-check yes
+
       if [[ ! -e ''${ZIM_HOME}/zimfw.zsh ]]; then
         curl -fsSL --create-dirs -o ''${ZIM_HOME}/zimfw.zsh \
           https://github.com/zimfw/zimfw/releases/latest/download/zimfw.zsh
@@ -137,7 +145,8 @@
       source ''${ZIM_HOME}/init.zsh
 
       eval "$(${pkgs.zoxide}/bin/zoxide init zsh)"
-      eval "$(${pkgs.chezmoi}/bin/chezmoi init --skip-prompt)"
+      eval "$(${pkgs.chezmoi}/bin/chezmoi init)"
+      eval "$(${pkgs.chezmoi}/bin/chezmoi completion zsh)"
     '';
 
     shellAliases = {
@@ -159,16 +168,16 @@
     zmodule utility
     zmodule git-info
     zmodule git
-    
+    zmodule completion
+
     # Additional modules
     zmodule zsh-users/zsh-completions
     zmodule zsh-users/zsh-autosuggestions
     zmodule zsh-users/zsh-syntax-highlighting
-    
+
     # Prompt
     zmodule prompt-pwd
     zmodule git-info
-    zmodule completion
     zmodule bira
   '';
 }
